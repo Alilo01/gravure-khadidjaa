@@ -58,6 +58,7 @@
     </style>
 </head>
 <body>
+
     <header>كتالوج مطبعة العمامرة</header>
     <input type="text" id="search" placeholder="🔍 ابحث عن منتج..." onkeyup="searchItems()">
     <div class="catalog" id="catalog">
@@ -122,20 +123,57 @@
             <p>🔹 السُمك: 1.5</p>
         </div>
     </div>
+	<div style="margin-top: 50px;">
+    <h2>طلب منتج</h2>
+    <input type="text" id="partNumber" placeholder="رقم القطعة" style="padding:10px; margin:5px;"><br>
+    <input type="text" id="name" placeholder="اسمك" style="padding:10px; margin:5px;"><br>
+    <input type="text" id="phone" placeholder="رقم الهاتف" style="padding:10px; margin:5px;"><br>
+    <input type="email" id="email" placeholder="الإيميل" style="padding:10px; margin:5px;"><br>
+    <button onclick="sendOrder()" style="padding:10px 20px; background-color:#007bff; color:white; border:none; border-radius:5px; margin-top:10px;">إرسال الطلب</button>
+</div>
+
     <script>
-        function searchItems() {
-            let input = document.getElementById('search').value.toLowerCase();
-            let items = document.getElementsByClassName('item');
-            
-            for (let i = 0; i < items.length; i++) {
-                let name = items[i].getAttribute('data-name').toLowerCase();
-                if (name.includes(input)) {
-                    items[i].style.display = "block";
-                } else {
-                    items[i].style.display = "none";
-                }
-            }
+    function sendOrder() {
+        let partNumber = document.getElementById('partNumber').value.trim();
+        let name = document.getElementById('name').value.trim();
+        let phone = document.getElementById('phone').value.trim();
+        let email = document.getElementById('email').value.trim();
+
+        if (partNumber === '' || name === '' || phone === '' || email === '') {
+            alert('يرجى ملء جميع الحقول.');
+            return;
         }
-    </script>
+
+        let botToken = '8094566164:AAGMW2QGPKrIBRQbpbxIq_K6ofl4byrJxag';
+        let chatId = '1632360717';
+        let message = `📦 طلب جديد:
+رقم القطعة: ${partNumber}
+👤 الاسم: ${name}
+📞 الهاتف: ${phone}
+📧 الإيميل: ${email}`;
+
+        let url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    alert('تم إرسال طلبك بنجاح ✅');
+                    // مسح الحقول بعد الإرسال
+                    document.getElementById('partNumber').value = '';
+                    document.getElementById('name').value = '';
+                    document.getElementById('phone').value = '';
+                    document.getElementById('email').value = '';
+                } else {
+                    alert('حدث خطأ أثناء إرسال الطلب ❌');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('حدث خطأ في الاتصال بالخادم ❌');
+            });
+    }
+</script>
+
 </body>
 </html>
